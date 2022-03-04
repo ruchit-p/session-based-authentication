@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const morgan = require("morgan");
 const app = express();
+const User = require('./models/User')
 
 app.use(bodyParser.urlencoded({extended: true}))
 
@@ -56,7 +57,32 @@ app.route('/signup')
 .get(sessionChecker, (req, res) =>{
     res.sendFile(__dirname + '/public/signup.html')
 })
+.post((req, res) => {
+    const user = new User({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password
+    })
 
+    user.save((err, docs) => {
+        if(err) {
+            res.redirect('/signup')
+        } else {
+            console.log(docs)
+            req.session.user = docs
+            res.redirect('/dashboard')
+        }
+    })
+})
+
+// route for user's dashboard
+app.get("/dashboard", (req, res) => {
+    if (req.session.user && req.cookies.user_sid) {
+      res.sendFile(__dirname + "/public/dashboard.html");
+    } else {
+      res.redirect("/login");
+    }
+  });
 
 
 app.listen(3000, ()=>{
