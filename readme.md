@@ -1,3 +1,4 @@
+![Alt Text](dash.png)
 # Session-Based Authentication
 
 ## Overview
